@@ -19,7 +19,6 @@ public class ConfigServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -3525770278214323878L;
 
-
 	/**
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
@@ -35,7 +34,7 @@ public class ConfigServlet extends HttpServlet {
             g.useDefaultPrettyPrinter();
 
             ConfigBean config = new ConfigBean();
-            config.setApiUrl("http://localhost:8081");
+            config.setApiUrl(determineApiUrl());
             config.setAccessToken(getSession(request).getTokenString());
             
             g.writeObject(config);
@@ -46,7 +45,13 @@ public class ConfigServlet extends HttpServlet {
             throw new ServletException(e);
         }
     }
-    
+
+	private String determineApiUrl() {
+		if (System.getenv("OCP_API_URL") != null) {
+			return System.getenv("OCP_API_URL");
+		}
+		return "http://localhost:8081";
+	}
 
     /**
      * Gets the KC session from the request.

@@ -1,10 +1,10 @@
 {
-	"realm": "ocp-example-app",
-	"realm-public-key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjt/9AkBi2Zp/a1YntsWLGqalzGUjF1VF0Wm1fCQ56FBJmIkQKiNO4BP/YGfmuyhDPDsRwDT3zjv4ZywsJ8UWBO+RfKShBeGc/28VEnZG4XaezYv95Ia7cRVIhaHlDI19Ub8S2BjEM6blazCFakDoVOGfqEi20ksQEW/XsjxAJ5MTvIoiEf2hKdMzuxr4IMZmdnEpfbFiNeCrtjKeXg4DOBc97KnknypgoQ2AS+Upm3pymdmmZESB619fApZgusJJE2hv6h0Z7syk1WdeU5Qva97A0Fxvoc8jYS9+DZs3FkBy4KHck3BOmgg3sn9RnkeEY/bhvOTveyff+ICjTeo4/QIDAQAB",
+	"realm": "${env.OCP_KC_REALM:ocp-example-app}",
+	"realm-public-key": "${env.OCP_KC_PUBLIC_KEY:MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjt/9AkBi2Zp/a1YntsWLGqalzGUjF1VF0Wm1fCQ56FBJmIkQKiNO4BP/YGfmuyhDPDsRwDT3zjv4ZywsJ8UWBO+RfKShBeGc/28VEnZG4XaezYv95Ia7cRVIhaHlDI19Ub8S2BjEM6blazCFakDoVOGfqEi20ksQEW/XsjxAJ5MTvIoiEf2hKdMzuxr4IMZmdnEpfbFiNeCrtjKeXg4DOBc97KnknypgoQ2AS+Upm3pymdmmZESB619fApZgusJJE2hv6h0Z7syk1WdeU5Qva97A0Fxvoc8jYS9+DZs3FkBy4KHck3BOmgg3sn9RnkeEY/bhvOTveyff+ICjTeo4/QIDAQAB}",
 	"bearer-only": false,
-	"auth-server-url": "http://bluejay.paalin.org:8180/auth",
+	"auth-server-url": "${env.OCP_KC_AUTH_URL:http://bluejay.paalin.org:8180/auth}",
 	"ssl-required": "NONE",
 	"public-client": true,
 	"disable-trust-manager": true,
-	"resource": "ui"
+	"resource": "${env.OCP_KC_CLIENT_ID_UI:ui}"
 }
