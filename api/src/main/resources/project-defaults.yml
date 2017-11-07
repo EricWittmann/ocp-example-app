@@ -1,0 +1,15 @@
+swarm:
+  port:
+    offset: 1
+  datasources:
+    data-sources:
+      OcpDS:
+        driver-name: h2
+        connection-url: jdbc:h2:mem:test
+        user-name: sa
+        password: sa
+  keycloak:
+    security:
+      constraints:
+        - url-pattern: /foo
+          methods: [GET]
