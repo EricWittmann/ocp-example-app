@@ -453,14 +453,14 @@
     {
       "id": "a6ca5a7e-c5ef-4b2b-8568-e8c88cf4cdd9",
       "clientId": "ui",
-      "rootUrl": "http://localhost:8080/",
-      "baseUrl": "http://localhost:8080/",
+      "rootUrl": "OCP_UI_URL",
+      "baseUrl": "OCP_UI_URL",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "http://localhost:8080/*"
+        "OCP_UI_URL*"
       ],
       "webOrigins": [
         "+"
