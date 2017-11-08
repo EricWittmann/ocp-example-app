@@ -24,7 +24,6 @@ You may want to map the port(s) so you can access the app
 The following environment variables control configuration of the app:
 
 	OCP_KC_REALM=ocp-example-app
-	OCP_KC_PUBLIC_KEY=<Public Key>
 	OCP_KC_AUTH_URL=<Keycloak URL>
 	OCP_KC_CLIENT_ID_UI=ui
 	OCP_API_URL=http://localhost:8081

@@ -6,9 +6,12 @@ metadata:
 message: |-
   The following secret(s) have been created in your project:
   
-         Username: ${GENERATED_DB_USER}
-         Password: ${GENERATED_DB_PASS}
-   Connection URL: postgresql://postgresql:5432/
+         SQL Username: ${GENERATED_DB_USER}
+         SQL Password: ${GENERATED_DB_PASS}
+         SQL Connection URL: postgresql://postgresql:5432/
+         Keycloak Username: ${GENERATED_KC_USER}
+         Keycloak Password: ${GENERATED_KC_PASS}
+
 objects:
 - kind: Secret
   apiVersion: v1
@@ -20,6 +23,16 @@ objects:
   stringData:
     database-user: "${GENERATED_DB_USER}"
     database-password: "${GENERATED_DB_PASS}"
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: ocp-example-app-auth
+    labels:
+      app: ocp-example-app-auth
+      template: ocp-example-app
+  stringData:
+    keycloak-user: "${GENERATED_KC_USER}"
+    keycloak-password: "${GENERATED_KC_PASS}"
 - apiVersion: v1
   kind: Service
   metadata:
@@ -36,6 +49,25 @@ objects:
         targetPort: 5432
     selector:
       name: postgresql
+    type: ClusterIP
+    sessionAffinity: None
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: ocp-example-app-auth
+    creationTimestamp: null
+    labels:
+      app: ocp-example-app-auth
+      template: ocp-example-app
+  spec:
+    ports:
+      - protocol: TCP
+        port: 8080
+        targetPort: 8080
+    selector:
+      name: ocp-example-app-auth
     type: ClusterIP
     sessionAffinity: None
   status:
@@ -179,6 +211,65 @@ objects:
   metadata:
     creationTimestamp: null
     labels:
+      app: ocp-example-app-auth
+      template: ocp-example-app
+    name: ocp-example-app-auth
+  spec:
+    replicas: 1
+    selector:
+      app: ocp-example-app-auth
+      deploymentconfig: ocp-example-app-auth
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ocp-example-app-auth
+          deploymentconfig: ocp-example-app-auth
+          template: ocp-example-app
+      spec:
+        replicas: 1
+        containers:
+        - image: ericwittmann/ocp-example-app-auth
+          imagePullPolicy: IfNotPresent
+          name: ocp-example-app-auth
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          env:
+             - name: OCP_KEYCLOAK_USER
+               valueFrom:
+                 secretKeyRef:
+                   name: ocp-example-app-auth
+                   key: keycloak-user
+             - name: OCP_KEYCLOAK_PASSWORD
+               valueFrom:
+                 secretKeyRef:
+                   name: ocp-example-app-auth
+                   key: keycloak-password
+             - name: OCP_UI_URL
+               value: https://${UI_ROUTE}/
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+    triggers:
+    - type: ConfigChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    labels:
       app: ocp-example-app-api
       template: ocp-example-app
     name: ocp-example-app-api
@@ -216,7 +307,7 @@ objects:
              - name: OCP_KC_REALM
                value: ${KC_REALM}
              - name: OCP_KC_AUTH_URL
-               value: ${KC_AUTH_URL}
+               value: https://${AUTH_ROUTE}/auth
              - name: OCP_DB_DRIVER_NAME
                value: postgresql
              - name: OCP_DB_CONNECTION_URL
@@ -294,26 +385,10 @@ objects:
           env:
              - name: OCP_KC_REALM
                value: ${KC_REALM}
-             - name: OCP_KC_PUBLIC_KEY
-               value: ${KC_PUBLIC_KEY}
              - name: OCP_KC_AUTH_URL
-               value: ${KC_AUTH_URL}
+               value: https://${AUTH_ROUTE}/auth
              - name: OCP_API_URL
-               value: https://ocp-example-app-api.staging.3sca.net
-             - name: OCP_DB_DRIVER_NAME
-               value: postgresql
-             - name: OCP_DB_CONNECTION_URL
-               value: jdbc:postgresql://postgresql:5432/${DB_NAME}
-             - name: OCP_DB_USER_NAME
-               valueFrom:
-                 secretKeyRef:
-                   name: postgresql
-                   key: database-user
-             - name: OCP_DB_PASSWORD
-               valueFrom:
-                 secretKeyRef:
-                   name: postgresql
-                   key: database-password
+               value: https://${API_ROUTE}
           resources: {}
           terminationMessagePath: /dev/termination-log
         dnsPolicy: ClusterFirst
@@ -325,13 +400,31 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
-    name: ocp-example-app-api.staging.3sca.net
+    name: ocp-example-app-auth
+    creationTimestamp: null
+    labels:
+      app: ocp-example-app-auth
+      template: ocp-example-app
+  spec:
+    host: ${AUTH_ROUTE}
+    to:
+      kind: Service
+      name: ocp-example-app-auth
+      weight: 100
+    tls:
+      termination: edge
+      insecureEdgeTerminationPolicy: Redirect
+    wildcardPolicy: None
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: ocp-example-app-api
     creationTimestamp: null
     labels:
       app: ocp-example-app-api
       template: ocp-example-app
   spec:
-    host: ocp-example-app-api.staging.3sca.net
+    host: ${API_ROUTE}
     to:
       kind: Service
       name: ocp-example-app-api
@@ -343,13 +436,13 @@ objects:
 - apiVersion: v1
   kind: Route
   metadata:
-    name: ocp-example-app-ui.staging.3sca.net
+    name: ocp-example-app-ui
     creationTimestamp: null
     labels:
       app: ocp-example-app-ui
       template: ocp-example-app
   spec:
-    host: ocp-example-app.staging.3sca.net
+    host: ${UI_ROUTE}
     to:
       kind: Service
       name: ocp-example-app-ui
@@ -359,6 +452,21 @@ objects:
       insecureEdgeTerminationPolicy: Redirect
     wildcardPolicy: None
 parameters:
+- name: UI_ROUTE
+  displayName: User Interface Route Name
+  description: The route name to use for the UI.
+  value: ocp-example-app-ui.staging.3sca.net
+  required: true
+- name: API_ROUTE
+  displayName: API Route Name
+  description: The route name to use for the API.
+  value: ocp-example-app-api.staging.3sca.net
+  required: true
+- name: AUTH_ROUTE
+  displayName: Authentication Route Name
+  description: The route name to use for Keycloak Authentication.
+  value: ocp-example-app-auth.staging.3sca.net
+  required: true
 - name: GENERATED_DB_USER
   displayName: PostgreSQL Connection Username
   description: Username for PostgreSQL user that will be used for accessing the database.
@@ -376,17 +484,21 @@ parameters:
   description: The name of the Postgresql database.
   value: ocpdb
   required: true
-- name: KC_AUTH_URL
-  displayName: Keycloak Authentication URL
-  description: The URL to Keycloak.
-  value: https://auth-apistudio.rhcloud.com/auth/
-  required: true
 - name: KC_REALM
   displayName: Keycloak Realm
   description: The name of the Keycloak realm to use for authentication.
   value: ocp-example-app
   required: true
-- name: KC_PUBLIC_KEY
-  displayName: Keycloak Realm Public Key
-  description: The public key fo the Keycloak realm used for authenticaiton.
+- name: GENERATED_KC_USER
+  displayName: Keycloak Admin Username
+  description: Username for the Keycloak admin user.
+  generate: expression
+  from: admin[A-Z0-9]{3}
   required: true
+- name: GENERATED_KC_PASS
+  displayName: Keycloak Admin Password
+  description: Password for the Keycloak admin user.
+  generate: expression
+  from: "[a-zA-Z0-9]{16}"
+  required: true
+  
