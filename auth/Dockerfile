@@ -7,7 +7,7 @@ USER root
 ADD realm.json /tmp/ocp-example-app-realm.json
 ADD auth-entrypoint.sh /opt/jboss/auth-entrypoint.sh
 
-RUN chown jboss /opt/jboss/auth-entrypoint.sh
+RUN chown jboss /opt/jboss/auth-entrypoint.sh; chmod 755 /opt/jboss/auth-entrypoint.sh
 
 USER jboss
 
