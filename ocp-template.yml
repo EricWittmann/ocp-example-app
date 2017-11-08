@@ -13,6 +13,16 @@ message: |-
          Keycloak Password: ${GENERATED_KC_PASS}
 
 objects:
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: keycloak-data
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
 - kind: Secret
   apiVersion: v1
   metadata:
@@ -197,7 +207,7 @@ objects:
               successThreshold: 1
               failureThreshold: 3
             terminationMessagePath: /dev/termination-log
-            imagePullPolicy: IfNotPresent
+            imagePullPolicy: Always
             securityContext:
               capabilities: {}
               privileged: false
@@ -220,14 +230,11 @@ objects:
       app: ocp-example-app-auth
       deploymentconfig: ocp-example-app-auth
     strategy:
-      resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
+      type: Recreate
+      recreateParams:
         timeoutSeconds: 600
-        updatePeriodSeconds: 1
-      type: Rolling
+      resources: {}
+      activeDeadlineSeconds: 21600
     template:
       metadata:
         creationTimestamp: null
@@ -237,10 +244,28 @@ objects:
           template: ocp-example-app
       spec:
         replicas: 1
+        volumes:
+          - name: keycloak-data
+            persistentVolumeClaim:
+              claimName: keycloak-data
+          - name: keycloak-tmp
+            emptyDir: {}
+          - name: keycloak-log
+            emptyDir: {}
         containers:
-        - image: ericwittmann/ocp-example-app-auth
-          imagePullPolicy: IfNotPresent
+        - image: ericwittmann/ocp-example-app-auth:latest
+          imagePullPolicy: Always
           name: ocp-example-app-auth
+          volumeMounts:
+          - mountPath: /opt/jboss/keycloak/standalone/data
+            name: keycloak-data
+            readOnly: false
+          - mountPath: /opt/jboss/keycloak/standalone/tmp
+            name: keycloak-tmp
+            readOnly: false
+          - mountPath: /opt/jboss/keycloak/standalone/log
+            name: keycloak-log
+            readOnly: false
           ports:
           - containerPort: 8080
             protocol: TCP
@@ -279,14 +304,11 @@ objects:
       app: ocp-example-app-api
       deploymentconfig: ocp-example-app-api
     strategy:
-      resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
+      type: Recreate
+      recreateParams:
         timeoutSeconds: 600
-        updatePeriodSeconds: 1
-      type: Rolling
+      resources: {}
+      activeDeadlineSeconds: 21600
     template:
       metadata:
         creationTimestamp: null
@@ -298,7 +320,7 @@ objects:
         replicas: 1
         containers:
         - image: ericwittmann/ocp-example-app-api
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: ocp-example-app-api
           ports:
           - containerPort: 8080
@@ -358,14 +380,11 @@ objects:
       app: ocp-example-app-ui
       deploymentconfig: ocp-example-app-ui
     strategy:
-      resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
+      type: Recreate
+      recreateParams:
         timeoutSeconds: 600
-        updatePeriodSeconds: 1
-      type: Rolling
+      resources: {}
+      activeDeadlineSeconds: 21600
     template:
       metadata:
         creationTimestamp: null
@@ -377,7 +396,7 @@ objects:
         replicas: 1
         containers:
         - image: ericwittmann/ocp-example-app-ui
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: ocp-example-app-ui
           ports:
           - containerPort: 8080
