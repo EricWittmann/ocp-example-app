@@ -56,20 +56,20 @@ objects:
 - apiVersion: v1
   kind: Service
   metadata:
-    name: ocp-example-app-auth
     creationTimestamp: null
     labels:
       app: ocp-example-app-auth
       template: ocp-example-app
+    name: ocp-example-app-auth
   spec:
     ports:
-      - protocol: TCP
-        port: 8080
-        targetPort: 8080
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
     selector:
-      name: ocp-example-app-auth
-    type: ClusterIP
+      app: ocp-example-app-auth
     sessionAffinity: None
+    type: ClusterIP
   status:
     loadBalancer: {}
 - apiVersion: v1
