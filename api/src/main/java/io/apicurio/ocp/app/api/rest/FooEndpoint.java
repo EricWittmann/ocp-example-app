@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.sql.DataSource;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -72,6 +73,17 @@ public class FooEndpoint {
 			statement.executeUpdate();
 			foo.setId(id);
 			return foo;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@DELETE
+	public void deleteAllFoos() {
+		System.out.println("Deleting all Foos");
+		try (Connection conn = dataSource.getConnection()) {
+			PreparedStatement statement = conn.prepareStatement("DELETE FROM foo");
+			statement.executeUpdate();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

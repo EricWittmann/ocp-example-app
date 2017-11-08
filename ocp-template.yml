@@ -232,6 +232,20 @@ objects:
                    name: postgresql
                    key: database-password
           resources: {}
+          livenessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /hello
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 10
           terminationMessagePath: /dev/termination-log
         dnsPolicy: ClusterFirst
         restartPolicy: Always

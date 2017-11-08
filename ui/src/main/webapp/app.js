@@ -62,6 +62,26 @@ function listFoos() {
 }
 
 
+function deleteAllFoos() {
+	$('#foo-list').html('<span class="spinner spinner-xs spinner-inline"></span> Deleting all Foos, please wait...');
+	$.ajax({
+		method: "DELETE",
+		url: CONFIG.apiUrl + "/foo",
+		headers: {
+			'Authorization': 'bearer ' + window.CONFIG.accessToken
+		},
+		success: function(data, status, xhr) {
+			$('#foo-list').html("<strong>No Foos found!  Add one?</strong>");
+		},
+		error: function(xhr, status, error) {
+			$('#foo-list').html('<div class="alert alert-danger"><span class="pficon pficon-error-circle-o"></span><strong>Error Deleting Foos</strong> Failed to delete the Foos!  Check console for details.</div>');
+			console.info("Error Status: %s", status);
+			console.info("Error: %o", error);
+		}
+	});
+}
+
+
 $(document).ready(function() {
 	$('#basic-init').html("<strong><span>Application (app.js) loaded!</span></strong>");
 	if (window.CONFIG && window.CONFIG.apiUrl) {
@@ -71,4 +91,5 @@ $(document).ready(function() {
 	}
 	listFoos();
 	$('#add-new-foo').click(addFoo);
+	$('#delete-all-foos').click(deleteAllFoos);
 });
