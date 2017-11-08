@@ -7,10 +7,9 @@ ADD auth-entrypoint.sh /opt/jboss/auth-entrypoint.sh
 
 ENV KEYCLOAK_USER=admin
 ENV KEYCLOAK_PASSWORD
-ENV 
+ENV KEYCLOAK_PASSWORD=password123!
+ENV OCP_UI_URL=http://localhost:8080/
 
-CMD /opt/jboss/auth-entrypoint.sh -b 0.0.0.0 \
-	-Dkeycloak.migration.action=import \
-	-Dkeycloak.migration.provider=singleFile \
-	-Dkeycloak.migration.strategy=IGNORE_EXISTING \
-	-Dkeycloak.migration.file=/tmp/ocp-example-app-realm.json
+ENTRYPOINT [ "/opt/jboss/auth-entrypoint.sh" ]
+
+CMD ["-b", "0.0.0.0", "-Dkeycloak.migration.action=import", "-Dkeycloak.migration.provider=singleFile", "-Dkeycloak.migration.strategy=IGNORE_EXISTING", "-Dkeycloak.migration.file=/tmp/ocp-example-app-realm.json"]
