@@ -542,6 +542,7 @@
 
     <modules>
         <module>api</module>
+        <module>auth</module>
         <module>ui</module>
     </modules>
 </project>
