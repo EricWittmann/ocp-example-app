@@ -2,8 +2,14 @@ FROM jboss/keycloak:3.3.0.Final
 
 LABEL authors="Eric Wittmann <eric.wittmann@redhat.com>"
 
+USER root
+
 ADD realm.json /tmp/ocp-example-app-realm.json
 ADD auth-entrypoint.sh /opt/jboss/auth-entrypoint.sh
+
+RUN chown jboss /opt/jboss/auth-entrypoint.sh
+
+USER jboss
 
 ENV OCP_KEYCLOAK_USER=admin
 ENV OCP_KEYCLOAK_PASSWORD=password123!
