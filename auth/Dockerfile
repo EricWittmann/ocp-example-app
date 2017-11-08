@@ -10,6 +10,8 @@ RUN mkdir -p /opt/jboss/keycloak/standalone/tmp/vfs \
  && chmod g+w -vfR /opt/jboss/keycloak/standalone/{tmp,configuration} \
  && chgrp 0 -vfR /opt/jboss/keycloak/standalone
 
+ENV PROXY_ADDRESS_FORWARDING=true
+
 USER jboss
 
 ADD realm.json /tmp/ocp-example-app-realm.json

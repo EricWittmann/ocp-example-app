@@ -248,10 +248,6 @@ objects:
           - name: keycloak-data
             persistentVolumeClaim:
               claimName: keycloak-data
-          - name: keycloak-tmp
-            emptyDir: {}
-          - name: keycloak-log
-            emptyDir: {}
         containers:
         - image: ericwittmann/ocp-example-app-auth:latest
           imagePullPolicy: Always
@@ -259,12 +255,6 @@ objects:
           volumeMounts:
           - mountPath: /opt/jboss/keycloak/standalone/data
             name: keycloak-data
-            readOnly: false
-          - mountPath: /opt/jboss/keycloak/standalone/tmp
-            name: keycloak-tmp
-            readOnly: false
-          - mountPath: /opt/jboss/keycloak/standalone/log
-            name: keycloak-log
             readOnly: false
           ports:
           - containerPort: 8080
@@ -319,7 +309,7 @@ objects:
       spec:
         replicas: 1
         containers:
-        - image: ericwittmann/ocp-example-app-api
+        - image: ericwittmann/ocp-example-app-api:latest
           imagePullPolicy: Always
           name: ocp-example-app-api
           ports:
@@ -395,7 +385,7 @@ objects:
       spec:
         replicas: 1
         containers:
-        - image: ericwittmann/ocp-example-app-ui
+        - image: ericwittmann/ocp-example-app-ui:latest
           imagePullPolicy: Always
           name: ocp-example-app-ui
           ports:
