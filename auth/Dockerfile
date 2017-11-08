@@ -2,10 +2,18 @@ FROM jboss/keycloak:3.3.0.Final
 
 LABEL authors="Eric Wittmann <eric.wittmann@redhat.com>"
 
+USER root
+
+RUN mkdir -p /opt/jboss/keycloak/standalone/tmp/vfs \
+ && chmod g+r -vfR /opt/jboss/keycloak/standalone \
+ && chmod g+w -vf /opt/jboss/keycloak/standalone/{.,deployments} \
+ && chmod g+w -vfR /opt/jboss/keycloak/standalone/{tmp,configuration} \
+ && chgrp 0 -vfR /opt/jboss/keycloak/standalone
+
+USER jboss
+
 ADD realm.json /tmp/ocp-example-app-realm.json
 ADD auth-entrypoint.sh /opt/jboss/auth-entrypoint.sh
-
-RUN chown jboss /opt/jboss/auth-entrypoint.sh; chmod 755 /opt/jboss/auth-entrypoint.sh
 
 ENV OCP_KEYCLOAK_USER=admin
 ENV OCP_KEYCLOAK_PASSWORD=password123!
