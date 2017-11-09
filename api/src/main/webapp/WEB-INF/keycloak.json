@@ -4,5 +4,6 @@
 	"auth-server-url": "${env.OCP_KC_AUTH_URL:http://bluejay.paalin.org:8180/auth}",
 	"ssl-required": "NONE",
 	"enable-cors": true,
+	"disable-trust-manager": true,
 	"resource": "${env.OCP_KC_CLIENT_ID_API:api}"
 }

@@ -26,5 +26,4 @@ ENV OCP_LOGGING_LEVEL=INFO
 
 CMD java -jar /opt/ocp-example-app/ocp-example-app-ui-swarm.jar \
     -Dswarm.port.offset=${OCP_PORT_OFFSET} \
-    -Dswarm.logging=${OCP_LOGGING_LEVEL} \
-    -Djavax.net.debug=all
+    -Dswarm.logging=${OCP_LOGGING_LEVEL}
