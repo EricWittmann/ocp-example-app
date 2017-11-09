@@ -22,6 +22,8 @@ ENV OCP_KC_AUTH_URL=https://auth-apistudio.rhcloud.com/auth/
 ENV OCP_KC_CLIENT_ID_UI=ui
 ENV OCP_API_URL=http://localhost:8081
 ENV OCP_PORT_OFFSET=0
+ENV OCP_LOGGING_LEVEL=INFO
 
 CMD java -jar /opt/ocp-example-app/ocp-example-app-ui-swarm.jar \
-    -Dswarm.port.offset=${OCP_PORT_OFFSET}
+    -Dswarm.port.offset=${OCP_PORT_OFFSET} \
+    -Dswarm.logging=${OCP_LOGGING_LEVEL}

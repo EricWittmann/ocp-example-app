@@ -25,6 +25,7 @@ ENV OCP_DB_DRIVER_NAME=h2
 ENV OCP_DB_CONNECTION_URL=jdbc:h2:mem:test
 ENV OCP_DB_USER_NAME=sa
 ENV OCP_DB_PASSWORD=sa
+ENV OCP_LOGGING_LEVEL=INFO
 
 
 CMD java -jar /opt/ocp-example-app/ocp-example-app-api-swarm.jar \
@@ -32,4 +33,5 @@ CMD java -jar /opt/ocp-example-app/ocp-example-app-api-swarm.jar \
     -Dswarm.datasources.data-sources.OcpDS.driver-name=${OCP_DB_DRIVER_NAME} \
     -Dswarm.datasources.data-sources.OcpDS.connection-url=${OCP_DB_CONNECTION_URL} \
     -Dswarm.datasources.data-sources.OcpDS.user-name=${OCP_DB_USER_NAME} \
-    -Dswarm.datasources.data-sources.OcpDS.password=${OCP_DB_PASSWORD}
+    -Dswarm.datasources.data-sources.OcpDS.password=${OCP_DB_PASSWORD} \
+    -Dswarm.logging=${OCP_LOGGING_LEVEL}
