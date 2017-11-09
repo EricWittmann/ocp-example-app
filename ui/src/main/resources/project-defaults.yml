@@ -1,3 +1,10 @@
 swarm:
   port:
     offset: 0
+  undertow:
+    servers:
+      default-server:
+        http-listeners:
+          default:
+            proxy-address-forwarding: true
+            enable-http2: true

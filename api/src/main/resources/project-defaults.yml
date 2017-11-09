@@ -8,3 +8,10 @@ swarm:
         connection-url: jdbc:h2:mem:test
         user-name: sa
         password: sa
+  undertow:
+    servers:
+      default-server:
+        http-listeners:
+          default:
+            proxy-address-forwarding: true
+            enable-http2: true
