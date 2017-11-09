@@ -398,6 +398,8 @@ objects:
                value: https://${AUTH_ROUTE}/auth
              - name: OCP_API_URL
                value: https://${API_ROUTE}
+             - name: OCP_LOGGING_LEVEL
+               value: DEBUG
           resources: {}
           terminationMessagePath: /dev/termination-log
         dnsPolicy: ClusterFirst
