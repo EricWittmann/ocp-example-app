@@ -14,6 +14,24 @@ message: |-
 
 objects:
 - apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: ocp-example-app-ui
+    generation: 1
+    creationTimestamp: null
+  spec:
+    tags:
+      - name: latest
+        annotations: null
+        from:
+          kind: DockerImage
+          name: ericwittmann/ocp-example-app-ui
+        generation: 1
+        importPolicy:
+          scheduled: true
+        referencePolicy:
+          type: Source
+- apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
     name: keycloak-data
@@ -385,7 +403,7 @@ objects:
       spec:
         replicas: 1
         containers:
-        - image: ericwittmann/ocp-example-app-ui:latest
+        - image: ocp-example-app-ui:latest
           imagePullPolicy: Always
           name: ocp-example-app-ui
           ports:
@@ -406,6 +424,14 @@ objects:
         restartPolicy: Always
         terminationGracePeriodSeconds: 30
     triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - ocp-example-app-ui
+        from:
+          kind: ImageStreamTag
+          name: 'ocp-example-app-ui:latest'
     - type: ConfigChange
   status: {}
 - apiVersion: v1
